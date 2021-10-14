@@ -20,11 +20,13 @@ import Chart from './chart';
 // https://github.com/dotintent/react-native-ble-plx/issues/744
 // http://denethor.wlu.ca/arduino/MLT-BT05-AT-commands-TRANSLATED.pdf
 // https://www.novelbits.io/uuid-for-custom-services-and-characteristics/
+// https://openbase.com/
 export default function DeviceScreen({route, navigation}) {
   const {bleManager, device} = route.params;
 
   const [value, setValue] = useState('');
   const [messages, setMessages] = useState('');
+  const [data, setData] = useState([0.0, 0.0, 0.0]);
   const [chartWidth, setChartWidth] = useState(
     Dimensions.get('window').width - 15,
   );
@@ -86,6 +88,8 @@ export default function DeviceScreen({route, navigation}) {
   }, [messages]);
 
   const handleSubmit = () => {
+    const newValue = parseFloat(value);
+    setData(data => [...data, newValue]);
     setMessages(messages + '\n' + value);
   };
 
@@ -112,7 +116,7 @@ export default function DeviceScreen({route, navigation}) {
       <VStack m={2} onLayout={handleViewLayout}>
         <ScrollView ref={scrollable}>
           <VStack space={2}>
-            <Chart width={chartWidth} />
+            <Chart width={chartWidth} data={data} />
             <TextArea bgColor="white" isReadOnly={true}>
               {messages}
             </TextArea>

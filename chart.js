@@ -14,29 +14,23 @@ import {
 import {LineChart} from 'react-native-chart-kit';
 
 export default function Chart(props) {
-  const {width} = props;
+  const {width, data} = props;
   return (
     <LineChart
       data={{
         labels: ['January', 'February', 'March', 'April', 'May', 'June'],
         datasets: [
           {
-            data: [
-              Math.random() * 100,
-              Math.random() * 100,
-              Math.random() * 100,
-              Math.random() * 100,
-              Math.random() * 100,
-              Math.random() * 100,
-            ],
+            data: data,
           },
         ],
       }}
       width={width} // from react-native
       height={330}
-      yAxisLabel="$"
-      yAxisSuffix="k"
+      yAxisLabel="+"
+      yAxisSuffix="g"
       yAxisInterval={1} // optional, defaults to 1
+      hidePointsAtIndex={[1]}
       chartConfig={{
         backgroundColor: '#e26a00',
         backgroundGradientFrom: '#cccccc',
