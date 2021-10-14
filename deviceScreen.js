@@ -11,11 +11,13 @@ import {
   Box,
   VStack,
 } from 'native-base';
-import {Buffer} from 'buffer';
+import base64 from 'react-native-base64';
 
 // NOTE: Debugging notes
 // https://github.com/dotintent/react-native-ble-plx/issues/744
 // https://github.com/dotintent/react-native-ble-plx/issues/744
+// http://denethor.wlu.ca/arduino/MLT-BT05-AT-commands-TRANSLATED.pdf
+// https://www.novelbits.io/uuid-for-custom-services-and-characteristics/
 export default function DeviceScreen({route, navigation}) {
   const {bleManager, device} = route.params;
 
@@ -30,61 +32,46 @@ export default function DeviceScreen({route, navigation}) {
 
     let connected = await bleManager.isDeviceConnected(device.id);
     console.log('Discovery connected', connected);
-    if (connected == false) {
-      try {
-        theDevice = await bleManager.connectToDevice(device.id);
-        let connected = await bleManager.isDeviceConnected(device.id);
-        console.log('Is connected', connected);
-        console.log('Device keys', Object.keys(theDevice));
-        console.log(
-          'Discover Services',
-          await theDevice.discoverAllServicesAndCharacteristics(),
-        );
-        const services = Object.values(await theDevice.services());
-        const characteristics = {};
-
-        for (let i = 0; i < services.length; i++) {
-          characteristics[services[i].uuid] =
-            await theDevice.characteristicsForService(services[i].uuid);
-        }
-
-        console.log('Service UUIDS', Object.keys(characteristics));
-        console.log('Characteristic', Object.keys(characteristics));
-
-        let message = 'Hello World\r\n'.toString('base64');
-        let writeResult =
-          await theDevice.writeCharacteristicWithResponseForService(
-            '0000ffe0-0000-1000-8000-00805f9b34fb',
-            '0000ffe1-0000-1000-8000-00805f9b34fb',
-            message,
-          );
-        console.log('Write result ', writeResult);
-        let state = await bleManager.state();
-        console.log('State', state, theDevice);
-      } catch (error) {
-        console.log('Connection error', error);
-      }
+    if (connected) {
+      theDevice = await bleManager.cancelDeviceConnection(device.id);
     }
 
     try {
-      //   console.log(await bleManager.devices([device.id]));
+      console.log('connect');
+      theDevice = await bleManager.connectToDevice(device.id);
+      console.log('is connected?');
+      let connected = await bleManager.isDeviceConnected(device.id);
+      console.log('Is connected', connected);
+      console.log('Device keys', Object.keys(theDevice));
+      console.log(
+        'Discover Services',
+        await theDevice.discoverAllServicesAndCharacteristics(),
+      );
+      const services = Object.values(await theDevice.services());
+      const characteristics = {};
 
-      let message = Buffer.from('Hello World', 'base64');
-      console.log(message);
-      let result = await bleManager.writeCharacteristicWithResponseForDevice(
-        device.id,
-        '0000ffe0-0000-1000-8000-00805f9b34fb',
-        '0000ffe1-0000-1000-8000-00805f9b34fb',
-        message.data,
-      );
-      console.log('Write result', result);
-      dev = await bleManager.discoverAllServicesAndCharacteristicsForDevice(
-        device.id,
-      );
-      console.log('Discovery results', dev);
+      for (let i = 0; i < services.length; i++) {
+        characteristics[services[i].uuid] =
+          await theDevice.characteristicsForService(services[i].uuid);
+      }
+
+      console.log('Service UUIDS', Object.keys(characteristics));
+      console.log('Characteristic', Object.keys(characteristics));
+
+      let message = base64.encode('Some string to encode to base64');
+      let writeResult =
+        await theDevice.writeCharacteristicWithResponseForService(
+          '0000ffe0-0000-1000-8000-00805f9b34fb',
+          '0000ffe1-0000-1000-8000-00805f9b34fb',
+          message,
+        );
+      console.log('Write result ', writeResult);
+      let state = await bleManager.state();
+      console.log('State', state, theDevice);
     } catch (error) {
-      console.log('Discovery error', error);
+      console.log('Connection error', error);
     }
+
     setIsConnected(true);
   };
 
