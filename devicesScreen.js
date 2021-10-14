@@ -64,7 +64,7 @@ export default function DevicesScreen({route, navigation}) {
       console.log('Stop scan 2');
       await bleManager.stopDeviceScan();
       setDevices({...devices, ...tempDevices});
-    }, 5000);
+    }, 3000);
   }
 
   async function stopScan() {

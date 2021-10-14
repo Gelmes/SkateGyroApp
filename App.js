@@ -40,6 +40,7 @@ import {
   FlatList,
   ScrollView,
   Spinner,
+  extendTheme,
 } from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -54,9 +55,39 @@ const NavStack = createNativeStackNavigator();
 
 function App() {
   const bleManager = new BleManager();
+  const theme = extendTheme({
+    components: {
+      Button: {
+        // Can simply pass default props to change default behaviour of components.
+        baseStyle: {
+          rounded: 'lg',
+          size: 'lg',
+        },
+      },
+      Input: {
+        baseStyle: {
+          rounded: 'lg',
+        },
+        defaultProps: {
+          size: 'lg',
+          borderRadius: 10,
+        },
+      },
+      TextArea: {
+        baseStyle: {
+          rounded: 'lg',
+          size: 'lg',
+        },
+        defaultProps: {
+          size: 'lg',
+          borderRadius: 10,
+        },
+      },
+    },
+  });
   return (
     <NavigationContainer>
-      <NativeBaseProvider>
+      <NativeBaseProvider theme={theme}>
         <NavStack.Navigator initialRouteName="SkateGyro">
           <NavStack.Screen
             name="SkateGyro"
