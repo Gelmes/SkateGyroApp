@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef, useCallback} from 'react';
-import {SafeAreaView, TextInput} from 'react-native';
+import {SafeAreaView, TextInput, Dimensions} from 'react-native';
 import {
   Text,
   Input,
@@ -10,8 +10,10 @@ import {
   NativeBaseProvider,
   Box,
   VStack,
+  KeyboardAvoidingView,
 } from 'native-base';
 import base64 from 'react-native-base64';
+import Chart from './chart';
 
 // NOTE: Debugging notes
 // https://github.com/dotintent/react-native-ble-plx/issues/744
@@ -23,7 +25,9 @@ export default function DeviceScreen({route, navigation}) {
 
   const [value, setValue] = useState('');
   const [messages, setMessages] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
+  const [chartWidth, setChartWidth] = useState(
+    Dimensions.get('window').width - 15,
+  );
   const scrollable = useRef(null);
 
   let theDevice = {};
@@ -71,8 +75,6 @@ export default function DeviceScreen({route, navigation}) {
     } catch (error) {
       console.log('Connection error', error);
     }
-
-    setIsConnected(true);
   };
 
   useEffect(() => {
@@ -100,27 +102,36 @@ export default function DeviceScreen({route, navigation}) {
     });
   }, [navigation]);
 
+  function handleViewLayout(event) {
+    const {x, y, width, height} = event.nativeEvent.layout;
+    setChartWidth(width);
+  }
+
   return (
     <SafeAreaView>
-      <ScrollView m={2} ref={scrollable}>
-        <VStack space={2}>
-          <TextArea bgColor="white" isReadOnly={true}>
-            {messages}
-          </TextArea>
-          <HStack space={2}>
-            <Input
-              flex={1}
-              onChangeText={setValue}
-              bgColor="white"
-              value={value}
-              onSubmitEditing={handleSubmit}
-              autoFocus={true}
-            />
-            <Button onPress={handleSubmit}>Submit</Button>
-          </HStack>
-          <Text>{device.id}</Text>
-        </VStack>
-      </ScrollView>
+      <VStack m={2} onLayout={handleViewLayout}>
+        <ScrollView ref={scrollable}>
+          <VStack space={2}>
+            <Chart width={chartWidth} />
+            <TextArea bgColor="white" isReadOnly={true}>
+              {messages}
+            </TextArea>
+            <HStack space={2}>
+              <Input
+                flex={1}
+                onChangeText={setValue}
+                bgColor="white"
+                value={value}
+                onSubmitEditing={handleSubmit}
+                autoFocus={true}
+                keyboardType="number-pad"
+              />
+              <Button onPress={handleSubmit}>Submit</Button>
+            </HStack>
+            <Text>{device.id}</Text>
+          </VStack>
+        </ScrollView>
+      </VStack>
     </SafeAreaView>
   );
 }
