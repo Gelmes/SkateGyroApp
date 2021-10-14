@@ -40,7 +40,9 @@ function BottomHome(props) {
   );
 }
 
-export default function SkateGyroScreen({navigation}) {
+export default function SkateGyroScreen({route, navigation}) {
+  const {bleManager} = route.params;
+
   const getPermissions = async () => {
     console.log('Getting Permissions');
     if (Platform.OS === 'android' && Platform.Version >= 23) {
@@ -76,7 +78,7 @@ export default function SkateGyroScreen({navigation}) {
 
   const handleClick = async () => {
     await getPermissions();
-    navigation.navigate('Devices');
+    navigation.navigate('Devices', {bleManager: bleManager});
   };
 
   return (

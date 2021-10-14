@@ -11,6 +11,7 @@ import React, {
   useEffect,
   createContext,
   useLayoutEffect,
+  useContext,
 } from 'react';
 import {
   View,
@@ -44,18 +45,40 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {styles} from './Style.js';
 
-import DevicesScreen from './deviceScreen.js';
+import DevicesScreen from './devicesScreen';
 import SkateGyroScreen from './skateGyroScreen';
+import DeviceScreen from './deviceScreen';
+import {BleManager} from 'react-native-ble-plx';
 
 const NavStack = createNativeStackNavigator();
 
 function App() {
+  const bleManager = new BleManager();
   return (
     <NavigationContainer>
       <NativeBaseProvider>
         <NavStack.Navigator initialRouteName="SkateGyro">
-          <NavStack.Screen name="SkateGyro" component={SkateGyroScreen} />
-          <NavStack.Screen name="Devices" component={DevicesScreen} />
+          <NavStack.Screen
+            name="SkateGyro"
+            component={SkateGyroScreen}
+            initialParams={{
+              bleManager: bleManager,
+            }}
+          />
+          <NavStack.Screen
+            name="Devices"
+            component={DevicesScreen}
+            initialParams={{
+              bleManager: bleManager,
+            }}
+          />
+          <NavStack.Screen
+            name="Device"
+            component={DeviceScreen}
+            initialParams={{
+              bleManager: bleManager,
+            }}
+          />
         </NavStack.Navigator>
       </NativeBaseProvider>
     </NavigationContainer>
